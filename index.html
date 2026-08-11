@@ -134,7 +134,7 @@
   <div id="panorama" aria-label="ภาพพาโนรามา 360 องศา วัดบางโทง"></div>
   <div class="shade"></div>
 
-  <audio id="bgAudio" preload="auto" autoplay playsinline webkit-playsinline>
+  <audio id="bgAudio" preload="auto" autoplay loop playsinline webkit-playsinline>
     <source src="wat-bang-thong-audio.mp3" type="audio/mpeg" />
     <source src="wat-bang-thong-audio.wav" type="audio/wav" />
   </audio>
@@ -228,7 +228,8 @@
 
     // Start narration immediately when the page opens and keep it independent from panorama controls.
     // iOS / Android browsers may still enforce their own audible-autoplay policy.
-    audio.loop = false;
+    audio.loop = true;
+    audio.defaultMuted = false;
     audio.volume = 1;
     audio.muted = false;
 
@@ -240,15 +241,22 @@
       soundToggle.title = off ? 'เปิดเสียง' : 'ปิดเสียง';
     }
 
+    let autoplayUnlocked = false;
     async function tryAutoplay() {
+      audio.autoplay = true;
+      audio.loop = true;
       audio.muted = false;
-      audio.currentTime = audio.currentTime || 0;
+      audio.defaultMuted = false;
+      audio.volume = 1;
       try {
         const p = audio.play();
         if (p && typeof p.then === 'function') await p;
+        autoplayUnlocked = true;
         soundToggle.classList.remove('needs-tap');
       } catch (err) {
-        // Browser policy may require the first user gesture before audible playback.
+        // Audible autoplay can be blocked by Safari / Chrome mobile policy.
+        // Keep requesting playback on lifecycle events and unlock on first gesture if needed.
+        autoplayUnlocked = false;
         soundToggle.classList.add('needs-tap');
       }
       updateSoundButton();
@@ -284,10 +292,18 @@
     audio.addEventListener('pause', updateSoundButton);
     audio.addEventListener('ended', updateSoundButton);
 
-    // Do not wait for the 6-second intro animation or the panorama image to finish loading.
+    // Request audible playback as early and as often as browser policy allows.
     tryAutoplay();
     document.addEventListener('DOMContentLoaded', tryAutoplay, { once: true });
+    window.addEventListener('load', tryAutoplay, { once: true });
     window.addEventListener('pageshow', tryAutoplay);
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible' && !autoplayUnlocked) tryAutoplay();
+    });
+    // A few short retries help desktop / Android browsers that become ready just after page parsing.
+    [150, 500, 1200, 2500].forEach(ms => setTimeout(() => {
+      if (!autoplayUnlocked && audio.paused) tryAutoplay();
+    }, ms));
 
     const modal = document.getElementById('learnModal');
     const openBtn = document.getElementById('openLearn');
