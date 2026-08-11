@@ -19,8 +19,8 @@
       --shadow: 0 14px 40px rgba(0,0,0,.25);
     }
     * { box-sizing: border-box; }
-    html, body { width: 100%; height: 100%; margin: 0; font-family: system-ui, -apple-system, "Noto Sans Thai", "Tahoma", sans-serif; background: #000; color: #fff; overflow: hidden; }
-    #panorama { position: fixed; inset: 0; width: 100%; height: 100%; background: #000; }
+    html, body { width: 100%; height: 100%; min-height: 100dvh; margin: 0; font-family: system-ui, -apple-system, "Noto Sans Thai", "Tahoma", sans-serif; background: #000; color: #fff; overflow: hidden; }
+    #panorama { position: fixed; inset: 0; width: 100%; height: 100%; height: 100dvh; background: #000; touch-action: none; overscroll-behavior: none; }
     .shade { position: fixed; inset: 0; pointer-events: none; background: linear-gradient(180deg, rgba(0,0,0,.50) 0%, rgba(0,0,0,.05) 28%, rgba(0,0,0,.06) 62%, rgba(0,0,0,.58) 100%); z-index: 3; }
     .topbar { position: fixed; z-index: 5; left: 0; right: 0; top: 0; padding: max(16px, env(safe-area-inset-top)) 18px 14px; display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; pointer-events: none; }
     .brand { pointer-events: auto; max-width: min(820px, calc(100vw - 110px)); text-shadow: 0 2px 16px rgba(0,0,0,.65); }
@@ -118,13 +118,26 @@
       .content { padding: 16px; font-size: 15px; }
       .learn-grid { grid-template-columns: 1fr; }
     }
+
+    @media (max-height: 520px) and (orientation: landscape) {
+      .topbar { padding-top: max(8px, env(safe-area-inset-top)); }
+      .brand h1 { font-size: 20px; }
+      .eyebrow, .brand p { display: none; }
+      .sound-btn { top: max(12px, env(safe-area-inset-top)); right: max(12px, env(safe-area-inset-right)); }
+      .bottom-ui { padding-bottom: max(8px, env(safe-area-inset-bottom)); }
+      .action-card { width: min(680px, 92vw); }
+      .intro-message { font-size: clamp(24px, 6vw, 42px); }
+    }
   </style>
 </head>
 <body>
   <div id="panorama" aria-label="ภาพพาโนรามา 360 องศา วัดบางโทง"></div>
   <div class="shade"></div>
 
-  <audio id="bgAudio" src="wat-bang-thong-audio.wav" preload="auto" autoplay></audio>
+  <audio id="bgAudio" preload="auto" autoplay playsinline webkit-playsinline>
+    <source src="wat-bang-thong-audio.mp3" type="audio/mpeg" />
+    <source src="wat-bang-thong-audio.wav" type="audio/wav" />
+  </audio>
   <button class="sound-btn" id="soundToggle" type="button" aria-label="ปิดเสียง" title="เปิด/ปิดเสียง">🔊</button>
 
   <div class="intro-overlay" id="introOverlay" aria-live="polite">
@@ -213,10 +226,11 @@
     const audio = document.getElementById('bgAudio');
     const soundToggle = document.getElementById('soundToggle');
 
-    // Play continuously through panorama interaction. Modern browsers may block audible autoplay;
-    // when that happens, the first tap / click anywhere starts the narration automatically.
+    // Start narration immediately when the page opens and keep it independent from panorama controls.
+    // iOS / Android browsers may still enforce their own audible-autoplay policy.
     audio.loop = false;
     audio.volume = 1;
+    audio.muted = false;
 
     function updateSoundButton() {
       const off = audio.paused || audio.muted;
@@ -227,18 +241,23 @@
     }
 
     async function tryAutoplay() {
+      audio.muted = false;
+      audio.currentTime = audio.currentTime || 0;
       try {
-        await audio.play();
+        const p = audio.play();
+        if (p && typeof p.then === 'function') await p;
         soundToggle.classList.remove('needs-tap');
       } catch (err) {
+        // Browser policy may require the first user gesture before audible playback.
         soundToggle.classList.add('needs-tap');
       }
       updateSoundButton();
     }
 
     soundToggle.addEventListener('click', async (e) => {
+      e.preventDefault();
       e.stopPropagation();
-      if (audio.paused) {
+      if (audio.paused || audio.muted) {
         audio.muted = false;
         try { await audio.play(); } catch (_) {}
       } else {
@@ -248,6 +267,7 @@
       updateSoundButton();
     });
 
+    // Fallback only when the browser blocks audible autoplay. The first touch anywhere unlocks sound.
     const unlockAudio = async () => {
       if (audio.paused && soundToggle.classList.contains('needs-tap')) {
         audio.muted = false;
@@ -256,11 +276,18 @@
         updateSoundButton();
       }
     };
-    document.addEventListener('pointerdown', unlockAudio, { once: true, capture: true });
+    ['pointerdown', 'touchstart', 'click'].forEach((eventName) => {
+      document.addEventListener(eventName, unlockAudio, { once: true, capture: true, passive: eventName === 'touchstart' });
+    });
+
     audio.addEventListener('play', updateSoundButton);
     audio.addEventListener('pause', updateSoundButton);
     audio.addEventListener('ended', updateSoundButton);
-    window.addEventListener('load', tryAutoplay);
+
+    // Do not wait for the 6-second intro animation or the panorama image to finish loading.
+    tryAutoplay();
+    document.addEventListener('DOMContentLoaded', tryAutoplay, { once: true });
+    window.addEventListener('pageshow', tryAutoplay);
 
     const modal = document.getElementById('learnModal');
     const openBtn = document.getElementById('openLearn');
