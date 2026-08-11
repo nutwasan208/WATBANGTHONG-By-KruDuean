@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#8d1d14" />
+  <title>วัดมหาธาตุวชิรมงคล (วัดบางโทง) | 360° Learning</title>
+  <meta name="description" content="สื่อการเรียนรู้แบบ 360 องศา วัดมหาธาตุวชิรมงคล (วัดบางโทง) จังหวัดกระบี่" />
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.css" />
+  <style>
+    :root {
+      --gold: #e7b653;
+      --gold-soft: #f8e6b3;
+      --red: #8d1d14;
+      --red-dark: #5d100b;
+      --ink: #201812;
+      --paper: #fffaf2;
+      --shadow: 0 14px 40px rgba(0,0,0,.25);
+    }
+    * { box-sizing: border-box; }
+    html, body { width: 100%; height: 100%; margin: 0; font-family: system-ui, -apple-system, "Noto Sans Thai", "Tahoma", sans-serif; background: #000; color: #fff; overflow: hidden; }
+    #panorama { position: fixed; inset: 0; width: 100%; height: 100%; background: #000; }
+    .shade { position: fixed; inset: 0; pointer-events: none; background: linear-gradient(180deg, rgba(0,0,0,.50) 0%, rgba(0,0,0,.05) 28%, rgba(0,0,0,.06) 62%, rgba(0,0,0,.58) 100%); z-index: 3; }
+    .topbar { position: fixed; z-index: 5; left: 0; right: 0; top: 0; padding: max(16px, env(safe-area-inset-top)) 18px 14px; display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; pointer-events: none; }
+    .brand { pointer-events: auto; max-width: min(820px, calc(100vw - 110px)); text-shadow: 0 2px 16px rgba(0,0,0,.65); }
+    .eyebrow { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; font-weight: 800; color: var(--gold-soft); margin-bottom: 4px; }
+    .brand h1 { margin: 0; font-size: clamp(20px, 3vw, 35px); line-height: 1.18; font-weight: 850; }
+    .brand p { margin: 5px 0 0; font-size: clamp(12px, 1.6vw, 16px); color: rgba(255,255,255,.92); }
+    .compass { pointer-events: auto; width: 48px; height: 48px; border-radius: 50%; display: grid; place-items: center; background: rgba(88,16,11,.86); border: 1px solid rgba(255,255,255,.26); box-shadow: 0 10px 28px rgba(0,0,0,.28); backdrop-filter: blur(8px); font-size: 22px; }
+    .bottom-ui { position: fixed; z-index: 6; left: 0; right: 0; bottom: 0; padding: 16px 18px max(18px, env(safe-area-inset-bottom)); display: flex; align-items: flex-end; justify-content: center; pointer-events: none; }
+    .action-card { width: min(760px, 100%); padding: 12px; border-radius: 22px; background: rgba(28,17,11,.62); border: 1px solid rgba(255,255,255,.16); backdrop-filter: blur(13px); box-shadow: var(--shadow); display: flex; align-items: center; gap: 12px; pointer-events: auto; }
+    .hint { flex: 1; min-width: 0; padding-left: 8px; }
+    .hint strong { display: block; font-size: 15px; }
+    .hint span { display: block; margin-top: 2px; font-size: 12px; color: rgba(255,255,255,.72); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .learn-btn { appearance: none; border: 0; cursor: pointer; padding: 13px 20px; border-radius: 14px; font: inherit; font-weight: 850; color: #34140d; background: linear-gradient(180deg, #f5d985, #dfad43); box-shadow: inset 0 1px 0 rgba(255,255,255,.75), 0 8px 22px rgba(0,0,0,.25); transition: transform .18s ease, filter .18s ease; white-space: nowrap; }
+    .learn-btn:hover { transform: translateY(-1px); filter: brightness(1.04); }
+    .learn-btn:active { transform: translateY(1px); }
+
+    .modal { position: fixed; inset: 0; z-index: 20; display: none; align-items: center; justify-content: center; padding: 18px; background: rgba(22,12,8,.68); backdrop-filter: blur(7px); }
+    .modal.open { display: flex; }
+    .panel { width: min(900px, 100%); max-height: min(86vh, 920px); overflow: auto; background: var(--paper); color: var(--ink); border-radius: 26px; box-shadow: 0 28px 90px rgba(0,0,0,.46); border: 1px solid rgba(231,182,83,.55); }
+    .panel-head { position: sticky; top: 0; z-index: 2; padding: 20px 22px 16px; display: flex; align-items: flex-start; justify-content: space-between; gap: 18px; background: linear-gradient(180deg, rgba(255,250,242,.98), rgba(255,250,242,.94)); border-bottom: 1px solid #eadcc8; backdrop-filter: blur(8px); }
+    .panel-head small { color: var(--red); font-weight: 850; }
+    .panel-head h2 { margin: 4px 0 0; color: var(--red-dark); font-size: clamp(22px, 4vw, 34px); line-height: 1.2; }
+    .close-btn { flex: 0 0 auto; width: 42px; height: 42px; border-radius: 50%; border: 1px solid #dfcfba; background: #fff; color: #4a2d20; font-size: 24px; cursor: pointer; box-shadow: 0 6px 16px rgba(75,45,32,.10); }
+    .content { padding: 22px; line-height: 1.75; font-size: 16px; }
+    .lead { font-size: 18px; font-weight: 750; color: #6a3728; margin-top: 0; }
+    .content h3 { color: var(--red); font-size: 21px; margin: 28px 0 10px; padding-bottom: 8px; border-bottom: 2px solid #f0dfbd; }
+    .content p { margin: 10px 0; }
+    .learn-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: 12px; }
+    .info-box { background: #fff; border: 1px solid #eadbc6; border-radius: 16px; padding: 15px; box-shadow: 0 6px 16px rgba(94,55,29,.06); }
+    .info-box b { color: #6e1a13; display: block; margin-bottom: 4px; }
+    .manners { background: #fff2df; border-left: 5px solid var(--gold); border-radius: 12px; padding: 15px 16px; }
+    .summary { background: linear-gradient(135deg, #7c1a12, #a63322); color: #fff; border-radius: 16px; padding: 18px; margin-top: 14px; }
+    .summary strong { color: #ffe5a7; }
+
+    /* Intro for young learners */
+    .intro-overlay {
+      position: fixed; inset: 0; z-index: 50; display: grid; place-items: center;
+      padding: 24px; background: rgba(0,0,0,.30); pointer-events: none;
+      animation: introOverlay 6s ease forwards;
+    }
+    .intro-message {
+      max-width: min(980px, 92vw); text-align: center;
+      font-family: "Mali", "Comic Sans MS", "Noto Sans Thai", Tahoma, sans-serif;
+      font-size: clamp(28px, 5.2vw, 66px); line-height: 1.28; font-weight: 900;
+      letter-spacing: .01em; color: #fff;
+      text-shadow: 0 4px 0 rgba(88,16,11,.25), 0 8px 24px rgba(0,0,0,.38);
+      animation: introText 6s ease forwards;
+    }
+    .intro-message .word-yellow { color: #ffe66d; }
+    .intro-message .word-pink { color: #ff8cc8; }
+    .intro-message .word-cyan { color: #76e6ff; }
+    .intro-message .word-green { color: #9cf59a; }
+    @keyframes introOverlay {
+      0%, 66.666% { opacity: 1; visibility: visible; }
+      100% { opacity: 0; visibility: hidden; }
+    }
+    @keyframes introText {
+      0% { opacity: 0; transform: translateY(12px) scale(.96); }
+      8%, 66.666% { opacity: 1; transform: translateY(0) scale(1); }
+      100% { opacity: 0; transform: translateY(-7px) scale(1.02); }
+    }
+
+    /* Audio control */
+    .sound-btn {
+      position: fixed; z-index: 12; top: max(78px, calc(env(safe-area-inset-top) + 74px)); right: 18px;
+      width: 52px; height: 52px; border: 1px solid rgba(255,255,255,.32); border-radius: 50%;
+      display: grid; place-items: center; cursor: pointer; color: #fff; font-size: 24px;
+      background: rgba(88,16,11,.88); box-shadow: 0 10px 28px rgba(0,0,0,.30);
+      backdrop-filter: blur(8px); transition: transform .18s ease, filter .18s ease;
+    }
+    .sound-btn:hover { transform: scale(1.05); filter: brightness(1.08); }
+    .sound-btn:active { transform: scale(.96); }
+    .sound-btn.is-muted { background: rgba(35,35,35,.82); }
+    .sound-btn.needs-tap { animation: soundPulse 1.2s ease-in-out infinite; }
+    @keyframes soundPulse { 50% { transform: scale(1.10); box-shadow: 0 0 0 9px rgba(255,230,109,.16), 0 10px 28px rgba(0,0,0,.30); } }
+
+    .pnlm-controls-container { z-index: 8 !important; }
+    .pnlm-control { border-radius: 10px !important; overflow: hidden; }
+    .pnlm-load-box { display: none !important; }
+
+    @media (max-width: 640px) {
+      .topbar { padding-left: 14px; padding-right: 14px; }
+      .brand p { display: none; }
+      .compass { width: 42px; height: 42px; }
+      .sound-btn { width: 46px; height: 46px; right: 14px; top: max(70px, calc(env(safe-area-inset-top) + 66px)); font-size: 21px; }
+      .bottom-ui { padding-left: 12px; padding-right: 12px; }
+      .action-card { border-radius: 18px; padding: 9px; gap: 8px; }
+      .hint { padding-left: 5px; }
+      .hint strong { font-size: 13px; }
+      .hint span { font-size: 11px; }
+      .learn-btn { padding: 12px 14px; font-size: 14px; }
+      .modal { padding: 10px; }
+      .panel { border-radius: 20px; max-height: 92vh; }
+      .panel-head { padding: 17px 16px 13px; }
+      .content { padding: 16px; font-size: 15px; }
+      .learn-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div id="panorama" aria-label="ภาพพาโนรามา 360 องศา วัดบางโทง"></div>
+  <div class="shade"></div>
+
+  <audio id="bgAudio" src="wat-bang-thong-audio.wav" preload="auto" autoplay></audio>
+  <button class="sound-btn" id="soundToggle" type="button" aria-label="ปิดเสียง" title="เปิด/ปิดเสียง">🔊</button>
+
+  <div class="intro-overlay" id="introOverlay" aria-live="polite">
+    <div class="intro-message">
+      <span class="word-yellow">มาทำความรู้จัก</span><br>
+      <span class="word-pink">วัดบางโทง</span>
+      <span class="word-cyan">จากสถานที่จริง</span><br>
+      <span class="word-green">กันนะเด็กๆ</span> 🌈✨
+    </div>
+  </div>
+
+  <header class="topbar">
+    <div class="brand">
+      <div class="eyebrow">◉ 360° LEARNING EXPERIENCE</div>
+      <h1>วัดมหาธาตุวชิรมงคล (วัดบางโทง)</h1>
+      <p>เรียนรู้ศาสนา ศิลปวัฒนธรรม และภูมิปัญญาไทย ผ่านสถานที่จริง</p>
+    </div>
+    <div class="compass" title="หมุนดูรอบทิศทาง">🧭</div>
+  </header>
+
+  <div class="bottom-ui">
+    <div class="action-card">
+      <div class="hint">
+        <strong>สำรวจภาพรอบตัวแบบ 360°</strong>
+        <span>ลากภาพเพื่อหมุน • ใช้นิ้วซูมบนมือถือ • กดปุ่ม + / − เพื่อขยาย</span>
+      </div>
+      <button class="learn-btn" id="openLearn">รู้จักวัดบางโทง</button>
+    </div>
+  </div>
+
+  <div class="modal" id="learnModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <article class="panel">
+      <div class="panel-head">
+        <div>
+          <small>สื่อการเรียนรู้</small>
+          <h2 id="modalTitle">วัดมหาธาตุวชิรมงคล (วัดบางโทง)</h2>
+        </div>
+        <button class="close-btn" id="closeLearn" aria-label="ปิด">×</button>
+      </div>
+      <div class="content">
+        <p class="lead">เรียนรู้ศาสนา ศิลปวัฒนธรรม และภูมิปัญญาไทย ผ่านสถานที่จริง</p>
+
+        <h3>รู้จักวัดบางโทง</h3>
+        <p><strong>วัดมหาธาตุวชิรมงคล</strong> หรือที่คนทั่วไปเรียกว่า <strong>“วัดบางโทง”</strong> เป็นวัดสำคัญและเป็นสถานที่ท่องเที่ยวทางศาสนาที่โดดเด่นแห่งหนึ่งของ <strong>จังหวัดกระบี่</strong> ตั้งอยู่ในพื้นที่ <strong>อำเภออ่าวลึก</strong></p>
+        <p>วัดแห่งนี้มีความโดดเด่นด้านสถาปัตยกรรมไทยที่สวยงาม โดยเฉพาะ <strong>พระมหาธาตุเจดีย์</strong> ซึ่งมีขนาดใหญ่และสง่างาม จึงเป็นทั้งสถานที่ประกอบศาสนกิจ แหล่งเรียนรู้ และสถานที่ที่ประชาชนเดินทางมาสักการะเพื่อความเป็นสิริมงคล</p>
+
+        <h3>จุดเด่นที่น่าเรียนรู้</h3>
+        <div class="learn-grid">
+          <div class="info-box"><b>🏯 พระมหาธาตุเจดีย์</b>เป็นสถาปัตยกรรมสำคัญของวัด มีความงดงามและโดดเด่น สามารถใช้เป็นแหล่งเรียนรู้เกี่ยวกับศิลปะ สถาปัตยกรรม และความศรัทธาในพระพุทธศาสนา</div>
+          <div class="info-box"><b>🙏 พระพุทธศาสนาและวิถีชีวิต</b>ภายในวัดเป็นพื้นที่สำหรับประกอบศาสนกิจ ทำบุญ สวดมนต์ และปฏิบัติธรรม ช่วยให้เราเรียนรู้ว่าพระพุทธศาสนามีความสัมพันธ์กับวิถีชีวิตของคนไทยอย่างไร</div>
+          <div class="info-box"><b>🎨 ศิลปกรรมและสถาปัตยกรรมไทย</b>เด็ก ๆ สามารถสังเกตลวดลาย สีสัน รูปทรงของอาคาร และองค์ประกอบต่าง ๆ ภายในวัด เพื่อเรียนรู้ว่าศิลปะสามารถถ่ายทอดเรื่องราว ความเชื่อ และวัฒนธรรมได้</div>
+          <div class="info-box"><b>🌿 วัดกับชุมชน</b>วัดไม่ได้เป็นเพียงสถานที่ทางศาสนา แต่ยังเป็นพื้นที่ที่เชื่อมโยงผู้คนในชุมชน เป็นแหล่งเรียนรู้ด้านประเพณี วัฒนธรรม และคุณค่าทางสังคม</div>
+        </div>
+
+        <h3>เมื่อไปวัด เราควรปฏิบัติตัวอย่างไร?</h3>
+        <div class="manners">การไปเยี่ยมชมวัดเป็นโอกาสที่ดีในการฝึก <strong>มารยาทและความเคารพ</strong> เด็ก ๆ ควรแต่งกายสุภาพ พูดคุยด้วยเสียงเบา ไม่วิ่งเล่นในบริเวณศาสนสถาน ไม่จับต้องสิ่งของโดยไม่ได้รับอนุญาต รักษาความสะอาด และปฏิบัติตามกฎของสถานที่</div>
+
+        <h3>สิ่งที่เราเรียนรู้จากวัดบางโทง</h3>
+        <div class="summary">การเรียนรู้จากวัดมหาธาตุวชิรมงคลช่วยให้เด็ก ๆ ได้เรียนรู้หลายเรื่องพร้อมกัน ทั้ง <strong>พระพุทธศาสนา ประวัติศาสตร์ ศิลปะ สถาปัตยกรรม วัฒนธรรมท้องถิ่น และการอยู่ร่วมกันในสังคม</strong></div>
+      </div>
+    </article>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.js"></script>
+  <script>
+    const viewer = pannellum.viewer('panorama', {
+      type: 'equirectangular',
+      panorama: 'panorama.jpg',
+      autoLoad: true,
+      showControls: true,
+      compass: false,
+      mouseZoom: true,
+      draggable: true,
+      keyboardZoom: true,
+      hfov: 105,
+      minHfov: 45,
+      maxHfov: 120,
+      pitch: 2,
+      yaw: 0,
+      autoRotate: -1.4,
+      autoRotateInactivityDelay: 3500,
+      friction: 0.16,
+      orientationOnByDefault: false
+    });
+
+    const audio = document.getElementById('bgAudio');
+    const soundToggle = document.getElementById('soundToggle');
+
+    // Play continuously through panorama interaction. Modern browsers may block audible autoplay;
+    // when that happens, the first tap / click anywhere starts the narration automatically.
+    audio.loop = false;
+    audio.volume = 1;
+
+    function updateSoundButton() {
+      const off = audio.paused || audio.muted;
+      soundToggle.textContent = off ? '🔇' : '🔊';
+      soundToggle.classList.toggle('is-muted', off);
+      soundToggle.setAttribute('aria-label', off ? 'เปิดเสียง' : 'ปิดเสียง');
+      soundToggle.title = off ? 'เปิดเสียง' : 'ปิดเสียง';
+    }
+
+    async function tryAutoplay() {
+      try {
+        await audio.play();
+        soundToggle.classList.remove('needs-tap');
+      } catch (err) {
+        soundToggle.classList.add('needs-tap');
+      }
+      updateSoundButton();
+    }
+
+    soundToggle.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      if (audio.paused) {
+        audio.muted = false;
+        try { await audio.play(); } catch (_) {}
+      } else {
+        audio.pause();
+      }
+      soundToggle.classList.remove('needs-tap');
+      updateSoundButton();
+    });
+
+    const unlockAudio = async () => {
+      if (audio.paused && soundToggle.classList.contains('needs-tap')) {
+        audio.muted = false;
+        try { await audio.play(); } catch (_) {}
+        soundToggle.classList.remove('needs-tap');
+        updateSoundButton();
+      }
+    };
+    document.addEventListener('pointerdown', unlockAudio, { once: true, capture: true });
+    audio.addEventListener('play', updateSoundButton);
+    audio.addEventListener('pause', updateSoundButton);
+    audio.addEventListener('ended', updateSoundButton);
+    window.addEventListener('load', tryAutoplay);
+
+    const modal = document.getElementById('learnModal');
+    const openBtn = document.getElementById('openLearn');
+    const closeBtn = document.getElementById('closeLearn');
+
+    function openModal() {
+      modal.classList.add('open');
+      document.body.dataset.modal = 'open';
+      viewer.stopAutoRotate();
+      closeBtn.focus();
+    }
+    function closeModal() {
+      modal.classList.remove('open');
+      delete document.body.dataset.modal;
+      openBtn.focus();
+    }
+
+    openBtn.addEventListener('click', openModal);
+    closeBtn.addEventListener('click', closeModal);
+    modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && modal.classList.contains('open')) closeModal();
+    });
+  </script>
+</body>
+</html>
