@@ -108,20 +108,6 @@
       0% { opacity: .95; transform: scale(.82); }
       100% { opacity: 0; transform: scale(1.75); }
     }
-    .sound-tip {
-      position: fixed; z-index: 13; top: max(82px, calc(env(safe-area-inset-top) + 78px)); right: 82px;
-      background: linear-gradient(135deg,#fff3a6,#ffd85a); color: #6b3b00; font-weight: 900; font-size: 14px;
-      padding: 10px 14px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,.28);
-      border: 2px solid rgba(255,255,255,.8); white-space: nowrap; opacity: 0; transform: translateX(8px) scale(.96);
-      pointer-events: none; transition: opacity .2s ease, transform .2s ease;
-    }
-    .sound-tip::after {
-      content: ""; position: absolute; top: 50%; right: -9px; transform: translateY(-50%);
-      border-width: 8px 0 8px 10px; border-style: solid; border-color: transparent transparent transparent #ffd85a;
-    }
-    .sound-tip.show { opacity: 1; transform: translateX(0) scale(1); animation: tipBounce 1.2s ease-in-out infinite; }
-    @keyframes tipBounce { 50% { transform: translateX(-3px) scale(1.02); } }
-
     .pnlm-controls-container { z-index: 8 !important; }
     .pnlm-control { border-radius: 10px !important; overflow: hidden; }
     .pnlm-load-box { display: none !important; }
@@ -131,7 +117,6 @@
       .brand p { display: none; }
       .compass { width: 42px; height: 42px; }
       .sound-btn { width: 46px; height: 46px; right: 14px; top: max(70px, calc(env(safe-area-inset-top) + 66px)); font-size: 21px; }
-      .sound-tip { right: 70px; top: max(71px, calc(env(safe-area-inset-top) + 67px)); font-size: 12px; padding: 8px 11px; border-radius: 14px; }
       .bottom-ui { padding-left: 12px; padding-right: 12px; }
       .action-card { border-radius: 18px; padding: 9px; gap: 8px; }
       .hint { padding-left: 5px; }
@@ -165,7 +150,6 @@
     <source src="wat-bang-thong-audio.wav" type="audio/wav" />
   </audio>
   <button class="sound-btn" id="soundToggle" type="button" aria-label="ปิดเสียง" title="เปิด/ปิดเสียง">🔊</button>
-  <div class="sound-tip" id="soundTip" role="status">🔊 แตะเพื่อเปิดเสียงนะเด็กๆ</div>
 
   <div class="intro-overlay" id="introOverlay" aria-live="polite">
     <div class="intro-message">
@@ -252,7 +236,6 @@
 
     const audio = document.getElementById('bgAudio');
     const soundToggle = document.getElementById('soundToggle');
-    const soundTip = document.getElementById('soundTip');
 
     // Start narration immediately when the page opens and keep it independent from panorama controls.
     // iOS / Android browsers may still enforce their own audible-autoplay policy.
@@ -281,14 +264,11 @@
         if (p && typeof p.then === 'function') await p;
         autoplayUnlocked = true;
         soundToggle.classList.remove('needs-tap');
-        soundTip.classList.remove('show');
-        soundTip.classList.remove('show');
       } catch (err) {
         // Audible autoplay can be blocked by Safari / Chrome mobile policy.
         // Keep requesting playback on lifecycle events and unlock on first gesture if needed.
         autoplayUnlocked = false;
         soundToggle.classList.add('needs-tap');
-        soundTip.classList.add('show');
       }
       updateSoundButton();
     }
@@ -303,7 +283,6 @@
         audio.pause();
       }
       soundToggle.classList.remove('needs-tap');
-      soundTip.classList.remove('show');
       updateSoundButton();
     });
 
